@@ -3,8 +3,8 @@ package com.game.chess.service;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.game.chess.util.ChessConstants;
 import com.game.chess.util.ErrorConstants;
@@ -164,45 +164,121 @@ public class ChessService {
 
 		int minRowIndex = 0;
 		int minColIndex = 0;
-		
-		//direct 1 --- forward in same col till max row index
-		if(currentRowIndex!=maxRowIndex) {
-			for(int i=currentRowIndex;i<=maxRowIndex;i++) {
-				possibleMovementsForPiece
-				.add(new String(Character.toString(chessCols.get(currentColIndex)).concat("" + (chessRows.get(i)))));
+		Set<String> tempList = new TreeSet<>();
+		if (currentColIndex != minColIndex) {
+			for (int i = currentColIndex - 1; i >= minColIndex; i--) {
+				tempList.add(
+						new String(Character.toString(chessCols.get(i)).concat("" + (chessRows.get(currentRowIndex)))));
 			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
 		}
-		
-		//direction2 backward in same col till row_index 0;
-		
-		
-		//direction3 -- forward in same row till max col index
-		if(currentColIndex!=maxColIndex) {
-			for(int i=currentColIndex;i<=maxRowIndex;i++) {
-				possibleMovementsForPiece
-				.add(new String(Character.toString(chessCols.get(i)).concat("" + (chessRows.get(currentRowIndex)))));
+		if (currentColIndex != maxColIndex) {
+			tempList = new TreeSet<>();
+			for (int i = currentColIndex + 1; i <= maxRowIndex; i++) {
+				tempList.add(
+						new String(Character.toString(chessCols.get(i)).concat("" + (chessRows.get(currentRowIndex)))));
 			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
 		}
-		
-		//direction4 backward in same row till col_index 0
-		
-		
-		
 
-		// backward in same row till col_index 0;
-		// backward in same col till row_index 0;
+		if (currentRowIndex != minRowIndex) {
+			tempList = new TreeSet<>();
+			for (int i = currentRowIndex - 1; i >= minRowIndex; i--) {
+				tempList.add(
+						new String(Character.toString(chessCols.get(currentColIndex)).concat("" + (chessRows.get(i)))));
+			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
+		}
 
-		// forward in right cross till max index(either row or col) -- increase both
-		// colIndex and rowIndex
-		// forward in left cross till max index of row or min index of col -- Increase
-		// rowIndex and descrease colIndex
+		if (currentRowIndex != maxRowIndex) {
+			tempList = new TreeSet<>();
+			for (int i = currentRowIndex + 1; i <= maxRowIndex; i++) {
+				tempList.add(
+						new String(Character.toString(chessCols.get(currentColIndex)).concat("" + (chessRows.get(i)))));
+			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
+		}
 
-		// backward in right cross till min Index(either row or col) -- decrease both
-		// col and row Index
-		// backward in left cross till min index of row and max index of col ---
-		// decrease rowIndex and increase colIndex
+		if (currentRowIndex != maxRowIndex && currentColIndex != minColIndex) {
+			tempList = new TreeSet<>();
+			boolean isLastIndexFound = false;
+			int rowIndex = currentRowIndex + 1;
+			int colIndex = currentColIndex - 1;
+			while (!isLastIndexFound) {
+				if (rowIndex > maxRowIndex || colIndex < minColIndex) {
+					isLastIndexFound = true;
+				} else {
+					tempList.add(new String(
+							Character.toString(chessCols.get(colIndex)).concat("" + (chessRows.get(rowIndex)))));
+					rowIndex++;
+					colIndex--;
+				}
+			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
+		}
 
-		return null;
+		if (currentRowIndex != minRowIndex && currentColIndex != maxColIndex) {
+			tempList = new TreeSet<>();
+			boolean isLastIndexFound = false;
+			int rowIndex = currentRowIndex - 1;
+			int colIndex = currentColIndex + 1;
+			while (!isLastIndexFound) {
+				if (rowIndex < minRowIndex || colIndex > maxColIndex) {
+					isLastIndexFound = true;
+				} else {
+					tempList.add(new String(
+							Character.toString(chessCols.get(colIndex)).concat("" + (chessRows.get(rowIndex)))));
+					rowIndex--;
+					colIndex++;
+				}
+			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
+		}
+		if (currentRowIndex != minRowIndex && currentColIndex != minColIndex) {
+			tempList = new TreeSet<>();
+			boolean isMinIndex = false;
+			int rowIndex = currentRowIndex - 1;
+			int colIndex = currentColIndex - 1;
+			while (!isMinIndex) {
+				if (rowIndex < minRowIndex || colIndex < minColIndex) {
+					isMinIndex = true;
+				} else {
+					tempList.add(new String(
+							Character.toString(chessCols.get(colIndex)).concat("" + (chessRows.get(rowIndex)))));
+					rowIndex--;
+					colIndex--;
+				}
+			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
+		}
+
+		if (currentRowIndex != maxRowIndex && currentColIndex != maxColIndex) {
+			tempList = new TreeSet<>();
+			boolean isMaxIndex = false;
+			int rowIndex = currentRowIndex + 1;
+			int colIndex = currentColIndex + 1;
+			while (!isMaxIndex) {
+				if (rowIndex > maxRowIndex || colIndex > maxColIndex) {
+					isMaxIndex = true;
+				} else {
+					tempList.add(new String(
+							Character.toString(chessCols.get(colIndex)).concat("" + (chessRows.get(rowIndex)))));
+					rowIndex++;
+					colIndex++;
+				}
+			}
+			possibleMovementsForPiece.addAll(tempList);
+			tempList = null;
+		}
+
+		return possibleMovementsForPiece;
 	}
 
 	private List<String> getPossibleMovesForKing(String pieceType, String position) {
